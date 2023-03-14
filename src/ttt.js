@@ -6,7 +6,7 @@ export class Board {
 	static defaultBoard() { return [ 0,0,0, 0,0,0, 0,0,0 ]}
 
 	static makeMove() {
-		return [ 0 0 0 0 0]
+		// return [ 0 0 0 0 0]
 	}
 }
 
@@ -36,7 +36,7 @@ export class TTT {
 			players: [],
 			offers: [],
 
-			board: TTT.defaultBoard(),
+			board: Board.defaultBoard(),
 
 			createdAt: Date.now()
 		}
