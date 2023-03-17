@@ -1,10 +1,5 @@
 import { TTT, TTTOwner, TTTChallenger } from './ttt.js'
 
-const channel = new MessageChannel()
-
-const serverPort = channel.port1
-const clientPort = channel.port2
-
 //
 function serviceHandleListGames(replyPort, data) {
 	const { user } = data
@@ -102,68 +97,32 @@ function serviceHandleMove(replyPort, data) {
 	})
 }
 
+function initPort(port) {
+	port.onmessage = message => {
+		const replyPort = port
+		const { data } = message
+		const { type } = data
 
-serverPort.onmessage = message => {
-	const replyPort = serverPort
-	const { data } = message
-	const { type } = data
+		console.log('service handle', type)
 
-	console.log('service handle', type)
+		if(type === 'list-games') { return serviceHandleListGames(replyPort, data) }
+		if(type === 'game') { return serviceHandleGame(replyPort, data) }
+		if(type === 'offer-game') { return serviceHandleOfferGame(replyPort, data) }
+		if(type === 'close') { return serviceHandleCloseGame(replyPort, data) }
+		if(type === 'accept') { return serviceHandleAcceptOffer(replyPort, data) }
+		if(type === 'decline') { return serviceHandleDeclineOffer(replyPort, data) }
+		if(type === 'move') { return serviceHandleMove(replyPort, data) }
 
-	if(type === 'list-games') { return serviceHandleListGames(replyPort, data) }
-	if(type === 'game') { return serviceHandleGame(replyPort, data) }
-	if(type === 'offer-game') { return serviceHandleOfferGame(replyPort, data) }
-	if(type === 'close') { return serviceHandleCloseGame(replyPort, data) }
-	if(type === 'accept') { return serviceHandleAcceptOffer(replyPort, data) }
-	if(type === 'decline') { return serviceHandleDeclineOffer(replyPort, data) }
-	if(type === 'move') { return serviceHandleMove(replyPort, data) }
-
-	console.warn('unhandled message', type)
+		console.warn('unhandled message', type)
+	}
 }
 
-//
-const user = 'me'
-clientPort.onmessage = message => {
-	const { data } = message
-	const { type } = data
+export class Service {
+	#port
 
-	if(type === 'game-listing') {
-		console.log('---- Listing', data)
-		return
+	static from(port) {
+		return new Service(port)
 	}
 
-	if(type === 'game') {
-		console.log('---- Game Info', data)
-		return
-	}
-
-	if(type === 'game-update') {
-		console.log('---- Update', data)
-		const { gameId } = data
-
-		return
-	}
-
-	if(type === 'game-offer') {
-		console.log('----- Game Offer', from)
-		return
-	}
-
-	console.warn('unhandled message', type)
+	constructor(port) { this.#port = initPort(port) }
 }
-
-
-//
-// clientPort.postMessage({ user, type: 'list-games' })
-clientPort.postMessage({ user, type: 'game' })
-// clientPort.postMessage({ user, type: 'list-games' })
-
-clientPort.postMessage({ user, type: 'offer-game', gameId: 0, target: 'AI' })
-//clientPort.postMessage({ user, type: 'offer-game', gameId: 0, target: 'AI' })
-clientPort.postMessage({ user: 'AI', type: 'accept', gameId: 0  })
-
-clientPort.postMessage({ user, type: 'list-games' })
-// clientPort.postMessage({ user: 'AI', type: 'list-games' })
-
-
-clientPort.postMessage({ user, type: 'move', index: 3 })
