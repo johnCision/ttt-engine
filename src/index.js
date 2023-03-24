@@ -1,14 +1,60 @@
-import { Client } from './client.js'
-
+import {
+	patchGames,
+	patchGame,
+	onContentLoad
+} from './ui.js'
 import { Service } from './service.js'
+import { AI } from './ai.js'
 
-const ch = new MessageChannel()
-const { port1, port2 } = ch
+const USER = 'me'
 
-const service = Service.from(port1)
+// const ch = new MessageChannel()
+// const { port1: servicePort, port2: clientPort } = ch
+
+// const service = Service.from(servicePort)
+// const client = { clientPort, user: USER }
+
+const servicePort = new BroadcastChannel('TTT')
+const clientPort = new BroadcastChannel('TTT')
+const clientAIPort = new BroadcastChannel('TTT')
+
+const service = Service.from(servicePort)
+const clientAI = AI.from(clientAIPort)
+const client = { clientPort, user: USER }
+
+
+clientPort.onmessage = message => {
+	// console.log({ message })
+	const { data } = message
+	const { type } = data
+
+	//
+	if (type === 'game-listing') {
+		const { games } = data
+		patchGames(games)
+		return
+	}
+
+	if(type === 'game-update') {
+		//patchGameById()
+		return
+	}
+
+	if (type === 'game') {
+		patchGame(data, client)
+		return
+	}
+
+	console.warn('unknown client message', type)
+}
 
 //
-const client = Client.from(port2)
+onContentLoad(client)
+
+//
+clientPort.postMessage({ user: USER, type: 'list-games' })
+
+
 
 
 // client.games.forEach()
