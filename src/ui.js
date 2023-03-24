@@ -53,8 +53,10 @@ function buildGameRow(gamesTable, game, client) {
 		console.log('!! update game board')
 
 		board.setAttribute('game-id', gameId)
+		board.setAttribute('state', '')
 
-		//client.clientPort.postMessage({ user: client.user, type: 'close', gameId })
+		// request game update
+		client.clientPort.postMessage({ user: client.user, type: 'game', gameId })
 
 		showGameBoard()
 	})
@@ -126,9 +128,7 @@ export function  onContentLoad(client) {
 
 			client.clientPort.postMessage({ user: client.user, type: 'move', gameId, move })
 		})
-
 	})
-
 }
 
 
@@ -177,6 +177,9 @@ export function patchGame(game, client) {
 	const currentGameId = currentBoard.getAttribute('game-id')
 	if(currentGameId === gameId) {
 		console.log('update current game board', game.board, game.state)
+
+		currentBoard.setAttribute('state', game.state)
+
 
 		game.board.forEach((value, index) => {
 			const cell = currentBoard.querySelector(`ttt-cell[position="${index}"]`)

@@ -15,6 +15,7 @@
 	--darker-color-raw-hsl: var(--color-h) var(--color-s) calc(var(--color-l) - 30%);
 	--darker-background-color: hsl(var(--darker-color-raw-hsl));
 	--darker-color: white;
+
 }
 
 html {
@@ -53,7 +54,7 @@ button[disabled] {
 	color: darkgray;
 }
 
-button:not([disabled]):hover {
+button:when(:not([disabled]):hover) {
 	background-color: var(--background-color);
 	border-color: var(--darker-background-color);
 }
@@ -128,13 +129,23 @@ main >span {
 }
 
 ttt-board {
-	--border-color: var(--color);
+	--border-color: var(--lighter-background-color);
 	--border: 2px solid var(--border-color);
 }
+
 ttt-board {
 	display: grid;
 	grid-template-rows: 1fr 1fr 1fr;
 	grid-template-columns: 1fr 1fr 1fr;
+}
+
+ttt-board:not([state="active"]) {
+	pointer-events: none;
+	--border-color: var(--darker-background-color);
+}
+
+ttt-board[state="active"] {
+	background-color: initial;
 }
 
 ttt-cell {
@@ -191,16 +202,18 @@ ttt-cell[player] > button {
 ttt-cell > button {
 	color: inherit;
 	display: block;
-	min-height: 1em;
+	min-height: 2em;
+	width: 100%;
 	background-color: transparent;
+	color: var(--color);
 	border: none;
 
 	cursor: pointer;
 }
 
 ttt-cell > button:hover {
-	background-color: var(--color);
-	color: var(--background-color);
+	background-color: var(--lighter-background-color);
+	color: var(--lighter-color);
 }
 
 ttt-cell > button:active {
@@ -224,7 +237,7 @@ aside > span {
 table[data-games-table] {
 	display: block;
 	color: inherit;
-	background-color: rgba(0 0 0  / 0.125);
+	background-color: hsl(var(--lighter-color-raw-hsl)  / 0.25);
 	border-radius: 1em;
 }
 

@@ -32,8 +32,19 @@ function initPort(port) {
 			if(state === 'active') {
 				if(active.includes(AI_USER)) {
 					console.log('AI:Game - my move')
+
 					// make move
-					port.postMessage({ user: AI_USER, type: 'move', gameId, move: Math.floor(Math.random() * 9) })
+					const move = Math.floor(Math.random() * 9)
+
+					setTimeout(() => {
+						port.postMessage({
+							user: AI_USER,
+							type: 'move',
+							gameId,
+							move
+						})
+					}, 1000 * Math.random() * 4 + 1)
+
 				}
 
 				return

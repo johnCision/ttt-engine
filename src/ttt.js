@@ -10,6 +10,8 @@ function isViewable(game, user) {
 		isActive(game, user)
 }
 
+const EMPTY = 0
+
 const STATES = {
 	NEW: 'new',
 	PENDING: 'pending',
@@ -46,7 +48,58 @@ function nextPlayerAfterUser_RR(game, user) {
 }
 
 export class Board {
-	static defaultBoard() { return [ 0,0,0, 0,0,0, 0,0,0 ]}
+	static defaultBoard() {
+		return [
+			EMPTY,EMPTY,EMPTY,
+			EMPTY,EMPTY,EMPTY,
+			EMPTY,EMPTY,EMPTY
+		]
+	}
+
+	static isFull(board) {
+		return !board.includes(EMPTY)
+	}
+
+	static winningUser(board) {
+
+		function matchUser(...args) {
+			const firstUser = board[args[0]]
+			if(firstUser === EMPTY) { return false }
+
+			return args
+				.map(boardIdx => board[boardIdx])
+				.every(user => user === firstUser)
+		}
+
+		// hardcoded rules
+		if(matchUser(0, 1, 2)) { return board[0] }
+		if(matchUser(3, 4, 5)) { return board[3] }
+		if(matchUser(6, 7, 8)) { return board[6] }
+
+		if(matchUser(0, 3, 6)) { return board[0] }
+		if(matchUser(1, 4, 7)) { return board[1] }
+		if(matchUser(2, 5, 8)) { return board[2] }
+
+		if(matchUser(0, 4, 8)) { return board[4] }
+
+		if(matchUser(2, 4, 6)) { return board[4] }
+
+		return EMPTY
+	}
+
+	static isWin(board) {
+		const winner = Board.winningUser(board)
+		return winner !== EMPTY
+	}
+
+	static isDraw(board) {
+		if(!Board.isFull(board)) { return false }
+		return !isWin(board)
+	}
+
+	static isResolved(board) {
+		return Board.isFull(board) || Board.isWin(board)
+	}
 }
 
 export class Action {
@@ -104,7 +157,6 @@ export class TTT {
 	}
 }
 
-
 export class TTTOwner {
 	static handleOfferGame(game, user, offer) {
 		const { target, autoAccept } = offer
@@ -143,9 +195,13 @@ export class TTTOwner {
 	}
 
 	static handleCloseGame(game, user) {
-		const isOwner = user === game.owner
-		if(!isOwner) {
+		if(!isOwner(game, user)) {
 			console.warn('not the owner')
+			return game
+		}
+
+		if(game.state === STATES.RESOLVED) {
+			console.warn('game already closed')
 			return game
 		}
 
@@ -168,7 +224,7 @@ export class TTTPlayer {
 	static handleMove(game, user, move) {
 		const { gameId, state } = game
 
-		console.log('TTTPlayer:MOVE', game, user, move)
+		// console.log('TTTPlayer:MOVE', game, user, move)
 
 		if(state !== STATES.ACTIVE) {
 			console.warn('can not move on a non-active game')
@@ -185,29 +241,27 @@ export class TTTPlayer {
 			return game
 		}
 
-		if(game.board[move] !== 0) {
+		if(game.board[move] !== EMPTY) {
 			console.warn('invalid move, cell taken', game, user)
 			return game
 		}
 
 		const nextActive = nextPlayerAfterUser_RR(game, user)
 
-
-
-
-		// player mover?
-		// can move?
-		// did win?
-
 		//
 		const nextBoard = game.board
 		nextBoard[move] = user
+
+		const nextState = Board.isResolved(nextBoard) ? STATES.RESOLVED : game.state
+
+		const winner = Board.winningUser(nextBoard)
+		console.log('winner', winner)
 
 		const nextGame = {
 			...game,
 			board: nextBoard,
 			active: nextActive,
-			state: game.state
+			state: nextState
 		}
 
 		TTT.games.set(gameId, nextGame)
@@ -216,6 +270,45 @@ export class TTTPlayer {
 			...nextGame,
 			actions: [ ]
 		}
+	}
+
+	static handleForfeit(game, user) {
+		const { gameId, state } = game
+
+		if(state !== STATES.ACTIVE) {
+			console.warn('can not forfeit a non-active game')
+			return game
+		}
+
+		if(!isPlayer(game, user)) {
+			console.warn('only players can forfeit', game, user)
+			return game
+		}
+
+		if(!isActive(game, user)) {
+			console.warn('only active players can forfeit', game, user)
+			return game
+		}
+
+
+
+
+		const newGame = {
+			...game,
+			active: [],
+			state: STATES.RESOLVED
+		}
+
+		TTT.games.set(game.gameId, newGame)
+
+		return {
+			...newGame,
+			actions: [ ]
+		}
+
+
+
+
 	}
 }
 
