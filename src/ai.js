@@ -60,7 +60,7 @@ function initPort(port, options) {
 					setTimeout(() => {
 						// make move
 						const { move } = evaluateMove(board, aiUser)
-						console.log('AI:Game - move', move, evaluateMove_minmax(board, aiUser))
+						console.log('AI:Game - move', move)
 
 						port.postMessage({
 							user: aiUser,

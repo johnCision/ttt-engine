@@ -7,7 +7,8 @@ function buildGameRow(gamesTable, game, client) {
 	const { gameId, state } = game
 
 	function buildOfferGameHandler(offerButton, gameId) {
-		const OFFER_TARGET = Math.random() > 0.5 ? 'AI:minmax' : 'AI:random'
+		const roll = Math.random()
+		const OFFER_TARGET = (roll > 0.66) ? 'AI:minmax' : (roll > 0.33) ? 'AI:threat' : 'AI:random'
 
 		return event => {
 			event.preventDefault()

@@ -20,6 +20,7 @@ const client = { clientPort, user: USER }
 const service = Service.from(new BroadcastChannel('TTT'))
 const clientAI_random = AI.from(new BroadcastChannel('TTT'), { strategy: STRATEGIES.RANDOM, user: 'AI:random' })
 const clientAI_minmax = AI.from(new BroadcastChannel('TTT'), { strategy: STRATEGIES.MINMAX, user: 'AI:minmax' })
+const clientAI_threat = AI.from(new BroadcastChannel('TTT'), { strategy: STRATEGIES.THREAT, user: 'AI:threat' })
 const clientAI_alphabeta = AI.from(new BroadcastChannel('TTT'), { strategy: STRATEGIES.ALPHABETA, user: 'AI:alphabeta' })
 
 

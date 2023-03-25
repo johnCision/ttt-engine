@@ -1,3 +1,8 @@
+import { EMPTY } from '../ttt.js'
+import {
+	NormalBoard,
+	NORMAL_SELF, NORMAL_OPPONENT
+} from './normal_board.js'
 
 export function evaluateMove(originalBoard, user) {
 	function calcThreatMatrix(board) {
