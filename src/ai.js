@@ -11,7 +11,7 @@ function evaluateMove_rand(board, user) {
 
 const NORMAL_SELF = 1
 const NORMAL_OPPONENT = -1
-function normalBoard(board, user) {
+function normalizeBoard(board, user) {
 	return board.map(cell => {
 		if(cell === EMPTY) { return EMPTY }
 		return cell === user ? NORMAL_SELF : NORMAL_OPPONENT
@@ -37,8 +37,8 @@ function heuristic(board) {
 	// console.log('board winer', board, winner)
 
 	if(winner === EMPTY) { return factor * -0.25 }
-	if(winner === NORMAL_SELF) { return factor * Infinity }
-	return factor * -Infinity
+	if(winner === NORMAL_SELF) { return factor * 1 }
+	return factor * -1
 }
 
 function pick(from) {
@@ -72,7 +72,7 @@ function evaluateMove_fake(originalBoard, user) {
 	}
 
 	const MAX_DEPTH = 8
-	return pick(minmax(normalBoard(originalBoard, user), 0, true, []))
+	return pick(minmax(normalizeBoard(originalBoard, user), 0, true, []))
 }
 
 function mm(board, depth, maximizing) {
@@ -114,7 +114,7 @@ function ab(board, depth, A, B, maximizing) {
 function evaluateMove_ab(board, user) {
 	const depth = 0
 
-	return potentialBoards(normalBoard(board, user), NORMAL_SELF).map(proposedMove => {
+	return potentialBoards(normalizeBoard(board, user), NORMAL_SELF).map(proposedMove => {
 		return {
 			move: proposedMove.move,
 			value: ab(proposedMove.board, depth, -Infinity, Infinity, false)
@@ -125,7 +125,7 @@ function evaluateMove_ab(board, user) {
 function evaluateMove_mm(board, user) {
 	const depth = 7
 
-	return pick(potentialBoards(normalBoard(board, user), NORMAL_SELF).map(proposedMove => {
+	return pick(potentialBoards(normalizeBoard(board, user), NORMAL_SELF).map(proposedMove => {
 		return {
 			move: proposedMove.move,
 			value: mm(proposedMove.board, depth, false)
@@ -133,11 +133,100 @@ function evaluateMove_mm(board, user) {
 	}))
 }
 
+function evaluateMove_threatMatrix(originalBoard, user) {
+	function calcThreatMatrix(board) {
+		const threatMatrix = [ ...board ].map(() => 0)
+
+		const winningCombinations = [
+			[0, 1, 2],
+			[3, 4, 5],
+			[6, 7, 8],
+
+			[0, 3, 6],
+			[1, 4, 7],
+			[2, 5, 8],
+
+			[0, 4, 8],
+			[2, 4, 6]
+		]
+
+		function comboFirstEmptyIdx(board, combo) {
+			return combo
+				.map(idx =>({ idx, value: board[idx] }))
+				.filter(({ value }) => value === EMPTY)
+				[0]?.idx
+		}
+
+		function comboUserCount(board, normalUser, combo) {
+			return combo.reduce((acc, idx) => {
+				if(board[idx] === EMPTY) { return acc }
+				if(board[idx] !== normalUser) { return acc }
+
+				return acc + 1
+			}, 0)
+		}
+
+		function comboSelfCount(board, combo) {
+			return comboUserCount(board, NORMAL_SELF, combo)
+		}
+
+		function comboOpponentCount(board, combo) {
+			return comboUserCount(board, NORMAL_OPPONENT, combo)
+		}
+
+		winningCombinations.forEach(combo => {
+			const emptyIdx = comboFirstEmptyIdx(board, combo)
+			// console.log('chk context', combo, emptyIdx, board[emptyIdx])
+			if(emptyIdx === undefined || board[emptyIdx] !== EMPTY) { return }
+
+			const selfCount = comboSelfCount(board, combo)
+			const opponentCount = comboOpponentCount(board, combo)
+
+			console.log('check combo', combo, emptyIdx, selfCount, opponentCount)
+
+			if(selfCount === 0 && opponentCount > 1) {
+				threatMatrix[emptyIdx] += 1
+			}
+			else if(opponentCount === 0 && selfCount > 1) {
+				threatMatrix[emptyIdx] += 1
+			}
+		})
+
+		return threatMatrix
+	}
+
+	const normalBoard = normalizeBoard(originalBoard, user)
+	const tm = calcThreatMatrix(normalBoard)
+	console.log(normalBoard, tm)
+
+	const move = [ ...new Array(normalBoard.length) ]
+		.reduce((acc, _, index) => {
+			const value = normalBoard[index]
+			if(value !== EMPTY) { return acc }
+
+			const threat = tm[index]
+
+			console.log('reduce', value, index, threat, acc.threat)
+
+			if(threat <= acc.threat) { return acc }
+
+			return {
+				idx: index,
+				threat
+			}
+		}, { idx: undefined, threat: -Infinity })
+
+		console.log(move)
+
+		return { move: move.idx }
+}
+
 function evaluateMove(board, user) {
 	// return evaluateMove_rand(board, user)
 	// return evaluateMove_fake(board, user)
-	return evaluateMove_mm(board, user)
+	// return evaluateMove_mm(board, user)
 	// return evaluateMove_ab(board, user)
+	return evaluateMove_threatMatrix(board, user)
 }
 
 function initPort(port) {
@@ -173,10 +262,10 @@ function initPort(port) {
 				if(active.includes(AI_USER)) {
 					console.log('AI:Game - my move')
 
-					// make move
-					const { move } = evaluateMove(board, AI_USER)
-
 					setTimeout(() => {
+						// make move
+						const { move } = evaluateMove(board, AI_USER)
+
 						port.postMessage({
 							user: AI_USER,
 							type: 'move',
@@ -222,10 +311,10 @@ export class AI {
 
 
 
-// const move = evaluateMove([
-// 	'X',  0,  0,
-// 	 0,  0,   0,
-// 	 0,  '.',   '.',
-// ], 'X')
+const move = evaluateMove([
+	'X',  0,  0,
+	 0,  0,   0,
+	 0,  '.',   '.',
+], 'X')
 
-// console.log('move', move)
+console.log('move', move)
