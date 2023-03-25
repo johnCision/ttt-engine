@@ -147,7 +147,7 @@ export function patchGames(games) {
 		const content = templates[0].content
 		const tr = content.cloneNode(true)
 
-		console.log('add', add)
+		// console.log('add', add)
 	})
 
 	updates.forEach(update => {
@@ -179,7 +179,7 @@ export function patchGame(game, client) {
 	const currentBoard = document.getElementById('gameBoard')
 	const currentGameId = currentBoard.getAttribute('game-id')
 	if(currentGameId === gameId) {
-		console.log('update current game board', game.board, game.state)
+		// console.log('update current game board', game.board, game.state)
 
 		currentBoard.setAttribute('state', game.state)
 

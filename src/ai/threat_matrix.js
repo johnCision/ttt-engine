@@ -68,7 +68,7 @@ export function evaluateMove(originalBoard, user) {
 
 	const normalBoard = NormalBoard.normalize(originalBoard, user)
 	const tm = calcThreatMatrix(normalBoard)
-	console.log(normalBoard, tm)
+	// console.log(normalBoard, tm)
 
 	const move = [ ...new Array(normalBoard.length) ]
 		.reduce((acc, _, index) => {
@@ -77,7 +77,7 @@ export function evaluateMove(originalBoard, user) {
 
 			const threat = tm[index]
 
-			console.log('reduce', value, index, threat, acc.threat)
+			// console.log('reduce', value, index, threat, acc.threat)
 
 			if(threat <= acc.threat) { return acc }
 
@@ -87,7 +87,7 @@ export function evaluateMove(originalBoard, user) {
 			}
 		}, { idx: undefined, threat: -Infinity })
 
-		console.log(move)
+		// console.log(move)
 
 		return { move: move.idx }
 }

@@ -35,7 +35,7 @@ function serviceHandleGame(replyPort, data) {
 
 	if(gameId !== undefined) {
 		// requesting game info not a new game
-		console.log('request gameId info', gameId)
+		// console.log('request gameId info', gameId)
 
 		const game = TTT.games.get(gameId)
 		if(game === undefined) {

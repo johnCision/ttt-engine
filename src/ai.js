@@ -35,7 +35,7 @@ function initPort(port, options) {
 		}
 
 		if (type === 'game-listing') {
-			console.log('AI:Listing', data)
+			// console.log('AI:Listing', data)
 			return
 		}
 
@@ -85,7 +85,7 @@ function initPort(port, options) {
 		}
 
 		if (type === 'game-offer') {
-			console.log('AI:Game Offer', from)
+			// console.log('AI:Game Offer', from)
 			return
 		}
 
