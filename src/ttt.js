@@ -224,8 +224,6 @@ export class TTTPlayer {
 	static handleMove(game, user, move) {
 		const { gameId, state } = game
 
-		// console.log('TTTPlayer:MOVE', game, user, move)
-
 		if(state !== STATES.ACTIVE) {
 			console.warn('can not move on a non-active game')
 			return game
@@ -255,7 +253,6 @@ export class TTTPlayer {
 		const nextState = Board.isResolved(nextBoard) ? STATES.RESOLVED : game.state
 
 		const winner = Board.winningUser(nextBoard)
-		console.log('winner', winner)
 
 		const nextGame = {
 			...game,

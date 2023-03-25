@@ -7,11 +7,13 @@ function buildGameRow(gamesTable, game, client) {
 	const { gameId, state } = game
 
 	function buildOfferGameHandler(offerButton, gameId) {
+		const OFFER_TARGET = Math.random() > 0.5 ? 'AI:minmax' : 'AI:random'
+
 		return event => {
 			event.preventDefault()
 			event.stopPropagation()
 			offerButton.disabled = true
-			client.clientPort.postMessage({ user: client.user, type: 'offer-game', gameId, target: 'AI' })
+			client.clientPort.postMessage({ user: client.user, type: 'offer-game', gameId, target: OFFER_TARGET })
 		}
 	}
 

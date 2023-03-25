@@ -4,7 +4,7 @@ import {
 	onContentLoad
 } from './ui.js'
 import { Service } from './service.js'
-import { AI } from './ai.js'
+import { AI, STRATEGIES } from './ai.js'
 
 const USER = 'me'
 
@@ -14,13 +14,13 @@ const USER = 'me'
 // const service = Service.from(servicePort)
 // const client = { clientPort, user: USER }
 
-const servicePort = new BroadcastChannel('TTT')
 const clientPort = new BroadcastChannel('TTT')
-const clientAIPort = new BroadcastChannel('TTT')
 
-const service = Service.from(servicePort)
-const clientAI = AI.from(clientAIPort)
 const client = { clientPort, user: USER }
+const service = Service.from(new BroadcastChannel('TTT'))
+const clientAI_random = AI.from(new BroadcastChannel('TTT'), { strategy: STRATEGIES.RANDOM, user: 'AI:random' })
+const clientAI_minmax = AI.from(new BroadcastChannel('TTT'), { strategy: STRATEGIES.MINMAX, user: 'AI:minmax' })
+const clientAI_alphabeta = AI.from(new BroadcastChannel('TTT'), { strategy: STRATEGIES.ALPHABETA, user: 'AI:alphabeta' })
 
 
 clientPort.onmessage = message => {
@@ -53,23 +53,3 @@ onContentLoad(client)
 
 //
 clientPort.postMessage({ user: USER, type: 'list-games' })
-
-
-
-
-// client.games.forEach()
-
-//
-// clientPort.postMessage({ user, type: 'list-games' })
-// clientPort.postMessage({ user, type: 'game' })
-// clientPort.postMessage({ user, type: 'list-games' })
-
-// clientPort.postMessage({ user, type: 'offer-game', gameId: 0, target: 'AI' })
-//clientPort.postMessage({ user, type: 'offer-game', gameId: 0, target: 'AI' })
-// clientPort.postMessage({ user: 'AI', type: 'accept', gameId: 0  })
-
-// clientPort.postMessage({ user, type: 'list-games' })
-// clientPort.postMessage({ user: 'AI', type: 'list-games' })
-
-
-// clientPort.postMessage({ user, type: 'move', index: 3 })
