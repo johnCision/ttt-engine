@@ -1,12 +1,22 @@
 <!DOCTYPE html>
 <html>
 	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="color-scheme" content="light dark" />
+		<meta name="theme-color" media="(prefers-color-scheme: light)" content="white">
+		<meta name="theme-color" media="(prefers-color-scheme: dark)" content="black">
+
+		<meta name="description" content="Demo">
+		<title>❌  ⭕️</title>
+
 		<link rel="stylesheet" href="index.css">
 		<script defer async type="module" src="./index.js"></script>
 	</head>
 	<body>
 		<nav>
-			<li><a id="gameListingLink" href="#">Games</a></li>
+			<li data-active><a id="gameListingLink" href="#">Games</a></li>
 			<li>Profile</li>
 		</nav>
 
@@ -14,12 +24,15 @@
 			<span>Games</span>
 			<button id="newGameButton" data-minor>+</button>
 			<table id="gamesTable" data-games-table>
-				<tr>
-					<th>ID</th>
-					<th>vs.</th>
-					<th>State</th>
-					<th>Actions</th>
-				</tr>
+				<thead>
+					<tr>
+						<th>ID</th>
+						<th>vs.</th>
+						<th>State</th>
+						<th>Actions</th>
+					</tr>
+				</thead>
+				<tbody></tbody>
 
 				<template>
 					<tr data-game-id>
@@ -40,6 +53,7 @@
 						</td>
 					</tr>
 				</template>
+
 			</table>
 		</section>
 
@@ -59,6 +73,18 @@
 				<ttt-cell position="8"><button></button></ttt-cell>
 			</ttt-board>
 		</main>
+
+		<section data-page="offer">
+			<span>Offer</span>
+
+			<form method="dialog">
+				<fieldset>
+					<input type="text">
+				</fieldset>
+
+				<button>Offer</button>
+			</form>
+		</section>
 
 		<aside>
 			<span>Activity</span>

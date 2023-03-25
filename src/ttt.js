@@ -10,7 +10,7 @@ function isViewable(game, user) {
 		isActive(game, user)
 }
 
-const EMPTY = 0
+export const EMPTY = 0
 
 const STATES = {
 	NEW: 'new',

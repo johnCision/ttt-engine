@@ -1,28 +1,65 @@
 
 :root {
-	--color-h: 270;
+	--main-start-size: 2em;
+	--main-title-font-size: 1.125em;
+
+	--player-filter-hue-rotate: 270deg;
+	--player-filter-brightness: 0%;
+}
+
+html {
+	height: 100%;
+	accent-color: red;
+}
+
+body {
+	--color-h: 270deg;
 	--color-s: 20%;
 	--color-l: 70%;
+
+	--accent-h: 300deg;
+	--accent-s: 93%;
+	--accent-l: 69%;
+
+	--accent-raw-hsl: var(--accent-h) var(--accent-s) var(--accent-l);
+	--accent: hsl(var(--accent-raw-hsl));
 
 	--color-raw-hsl: var(--color-h) var(--color-s) var(--color-l);
 	--background-color: hsl(var(--color-raw-hsl));
 	--color: black;
 
-	--lighter-color-raw-hsl: var(--color-h) var(--color-s) calc(var(--color-l) + 20%);
+	--lighter: 20%;
+	--lighter-color-raw-hsl: var(--color-h) var(--color-s) calc(var(--color-l) + var(--lighter));
 	--lighter-background-color: hsl(var(--lighter-color-raw-hsl));
 	--lighter-color: black;
 
-	--darker-color-raw-hsl: var(--color-h) var(--color-s) calc(var(--color-l) - 30%);
+	--darker: 30%;
+	--darker-color-raw-hsl: var(--color-h) var(--color-s) calc(var(--color-l) - var(--darker));
 	--darker-background-color: hsl(var(--darker-color-raw-hsl));
 	--darker-color: white;
-
 }
 
-html {
-	height: 100%;
+:is([data-green]) {
+	--color-h: 146deg;
+	--color-s: 57%;
+	--color-l: 30%;
+
+	--accent-h: 129deg;
+	--accent-s: 100%;
+	--accent-l: 69%;
+
+	--lighter: 40%;
+	--darker: 10%;
+
+	--color: white;
+
+	--player-filter-hue-rotate: 180deg;
+	--player-filter-brightness: 200%;
 }
 
 body {
+	container-type: inline-size;
+
 	font-family: sans-serif;
 
 	height: 100%;
@@ -36,6 +73,27 @@ body {
 	grid-template-areas: "nav nav" "main aside";
 	grid-template-columns: 1fr min-content;
 	grid-template-rows: min-content 1fr;
+}
+
+form {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5em;
+}
+
+fieldset {
+	margin: 0;
+	padding: 0;
+	border: none;
+
+	display: flex;
+	gap: 0.5em;
+}
+
+input[type="text"] {
+	width: 100%;
+	font-size: 1.5em;
+	outline-color: var(--accent);
 }
 
 button {
@@ -54,9 +112,14 @@ button[disabled] {
 	color: darkgray;
 }
 
-button:when(:not([disabled]):hover) {
+button:not([disabled]):hover {
 	background-color: var(--background-color);
 	border-color: var(--darker-background-color);
+}
+
+button:not([disabled]):active {
+	background-color: var(--accent);
+	border-color: transparent;
 }
 
 nav {
@@ -79,9 +142,15 @@ nav > li:first-child {
 nav > li > a {
 	display: block;
 	color: inherit;
-	/* text-decoration: none; */
+	text-decoration: none;
 	padding-block: 1em;
 	padding-inline: 0.5em;
+
+	border-block-end: 4px solid transparent;
+}
+
+nav > li[data-active] > a {
+	border-color: var(--accent);
 }
 
 nav > li:not(:has(> a)) {
@@ -100,7 +169,7 @@ section {
 	gap: 1em;
 
 	padding-inline: 1em;
-	padding-block-start: 2em;
+	padding-block-start: var(--main-start-size);;
 
 	background-color: var(--background-color);
 	color: var(--color);
@@ -108,6 +177,11 @@ section {
 
 section:not([data-active]) {
 	display: none;
+}
+
+
+section > span {
+	font-size: var(--main-title-font-size);
 }
 
 main {
@@ -126,6 +200,14 @@ main[data-active] {
 
 main >span {
 	color: var(--color);
+}
+
+select {
+	font-size: 1.5em;
+	padding-inline: 1ch;
+	padding-block: 0.25em;
+	background-color: var(--lighter-background-color);
+	color: var(--lighter-color)
 }
 
 ttt-board {
@@ -182,7 +264,9 @@ ttt-cell[player]:before {
 	justify-content: center;
 	content: var(--content);
 
-	filter: hue-rotate(270deg);
+	filter: hue-rotate(var(--player-filter-hue-rotate)) brightness(80%);
+	/* filter: contrast(175%) brightness(3%); */
+
 }
 
 ttt-cell[player="me"] {
@@ -211,12 +295,12 @@ ttt-cell > button {
 	cursor: pointer;
 }
 
-ttt-cell > button:hover {
+ttt-cell > button:not([disabled]):hover {
 	background-color: var(--lighter-background-color);
 	color: var(--lighter-color);
 }
 
-ttt-cell > button:active {
+ttt-cell > button:not([disabled]):active {
 	background-color: white;
 }
 
@@ -224,21 +308,32 @@ aside {
 	grid-area: aside;
 	background-color: var(--darker-background-color);
 	color: var(--darker-color);
-	/* max-width: 400px;
-	min-width: 200px; */
-	padding-inline: 0.5em;
-	padding-block-start: 1em;
+	padding-block-start: var(--main-start-size);
+	padding-inline: 1em;
+
+	min-width: 20ch;
+}
+
+@container (max-width: 700px) {
+	aside {
+		display: none;
+	}
 }
 
 aside > span {
-	font-size: 1.5em;
+	font-size: var(--main-title-font-size);
 }
 
 table[data-games-table] {
 	display: block;
 	color: inherit;
-	background-color: hsl(var(--lighter-color-raw-hsl)  / 0.25);
+	background-color: hsl(var(--lighter-color-raw-hsl) / 0.25);
 	border-radius: 1em;
+}
+
+table[data-games-table] > thead {
+	display: block;
+	margin-block: 1em;
 }
 
 table[data-games-table] > tbody {
