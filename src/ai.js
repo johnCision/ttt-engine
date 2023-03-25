@@ -311,10 +311,10 @@ export class AI {
 
 
 
-const move = evaluateMove([
-	'X',  0,  0,
-	 0,  0,   0,
-	 0,  '.',   '.',
-], 'X')
+// const move = evaluateMove([
+// 	'X',  0,  0,
+// 	 0,  0,   0,
+// 	 0,  '.',   '.',
+// ], 'X')
 
-console.log('move', move)
+// console.log('move', move)
