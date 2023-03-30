@@ -168,6 +168,8 @@ section {
 	flex-direction: column;
 	gap: 1em;
 
+	overflow-y: scroll;
+
 	padding-inline: 1em;
 	padding-block-start: var(--main-start-size);;
 
@@ -329,6 +331,9 @@ table[data-games-table] {
 	color: inherit;
 	background-color: hsl(var(--lighter-color-raw-hsl) / 0.25);
 	border-radius: 1em;
+
+	margin-block-end: 1em;
+	/* height: 100%; */
 }
 
 table[data-games-table] > thead {
@@ -339,6 +344,8 @@ table[data-games-table] > thead {
 table[data-games-table] > tbody {
 	display: block;
 	margin-block-start: 1em;
+
+	overflow-y: hidden;
 }
 
 table[data-games-table] tr {
@@ -375,6 +382,7 @@ button[data-minor] {
 	/* place-content: center; */
 	justify-content: center;
 	max-width: 2em;
+	min-height: 2em;
 	padding: 0;
 }
 

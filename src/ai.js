@@ -29,8 +29,8 @@ function initPort(port, options) {
 		const { data } = message
 		const { type } = data
 
-		const CLIENT_TYPES = ['list-games', 'offer-game', 'move']
-		if(CLIENT_TYPES.includes(type)) {
+		const IGNORE_TYPES = [ 'game?', 'list-games', 'offer-game', 'move', 'accept', 'close', '_service_ping' ]
+		if(IGNORE_TYPES.includes(type)) {
 			return
 		}
 
@@ -39,7 +39,7 @@ function initPort(port, options) {
 			return
 		}
 
-		if (type === 'game') {
+		if (type === 'game!') {
 			// console.log('AI:Game Info', data)
 			const { active, offers, state, gameId, board } = data
 

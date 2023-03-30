@@ -1,15 +1,15 @@
 // file deepcode ignore UsageOfUndefinedReturnValue: early exists are ok
 import { TTT, TTTOwner, TTTChallenger, TTTPlayer } from './ttt.js'
 
-const MSG_TYPES = {
+export const MSG_TYPES = {
 	LISTING: 'game-listing',
 	UPDATE: 'game-update',
-	GAME: 'game',
+	GAME: 'game!',
 }
 
-const CLIENT_MSG_TYPES = {
+export const CLIENT_MSG_TYPES = {
 	LIST: 'list-games',
-	GAME: 'game',
+	GAME: 'game?',
 	OFFER: 'offer-game',
 	CLOSE: 'close',
 	ACCEPT: 'accept',
@@ -23,6 +23,7 @@ function serviceHandleListGames(replyPort, data) {
 	const { user } = data
 
 	const games = TTT.handleListGames(user)
+	console.log('list games', games)
 
 	replyPort.postMessage({
 		type: 'game-listing',
@@ -195,10 +196,29 @@ function serviceHandleMove(replyPort, data) {
 }
 
 function initPort(port) {
+
+	let pingTask
+	setTimeout(() => {
+			pingTask = setInterval(() => {
+				port.postMessage({ type: '_service_ping' })
+			}, 1000 * 4)
+		}, 1000 * 1)
+
 	port.onmessage = message => {
 		const replyPort = port
 		const { data } = message
 		const { type } = data
+
+		if(type === '_service_ping') {
+			console.warn('Service PING ... close')
+			clearInterval(pingTask)
+			port.close()
+		}
+
+		const IGNORE_TYPES = [ 'game-listing', '_service_ping' ]
+		if(IGNORE_TYPES.includes(type)) {
+			return
+		}
 
   	if(type === CLIENT_MSG_TYPES.LIST) { return serviceHandleListGames(replyPort, data) }
 		if(type === CLIENT_MSG_TYPES.GAME) { return serviceHandleGame(replyPort, data) }

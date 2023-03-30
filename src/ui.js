@@ -34,14 +34,10 @@ function buildGameRow(gamesTable, game, client) {
 	//
 	tr.setAttribute('data-game-id', gameId)
 
-	const gameIdSlot = tr.querySelector('slot[name="gameId"]')
-	const vsSlot = tr.querySelector('slot[name="vs"]')
-	const stateSlot = tr.querySelector('slot[name="state"]')
+	//
+	updateGameRow(tr, game)
 
-	gameIdSlot.innerText = gameId
-	vsSlot.innerText = playersToVs(game)
-	stateSlot.innerText = state
-
+	//
 	const closeButton = tr.querySelector('button[data-close-game]')
 	closeButton.addEventListener('click', buildCloseGameHandler(closeButton, gameId), { once: true })
 
@@ -59,7 +55,7 @@ function buildGameRow(gamesTable, game, client) {
 		board.setAttribute('state', '')
 
 		// request game update
-		client.clientPort.postMessage({ user: client.user, type: 'game', gameId })
+		client.clientPort.postMessage({ user: client.user, type: 'game?', gameId })
 
 		showGameBoard()
 	})
@@ -107,7 +103,7 @@ export function  onContentLoad(client) {
 	newGameElem.addEventListener('click', event => {
 		newGameElem.disabled = true
 
-		client.clientPort.postMessage({ user: client.user, type: 'game' })
+		client.clientPort.postMessage({ user: client.user, type: 'game?' })
 
 		newGameElem.disabled = false
 	})
@@ -132,6 +128,7 @@ export function  onContentLoad(client) {
 			client.clientPort.postMessage({ user: client.user, type: 'move', gameId, move })
 		})
 	})
+
 }
 
 
@@ -147,15 +144,15 @@ export function patchGames(games) {
 		const content = templates[0].content
 		const tr = content.cloneNode(true)
 
-		// console.log('add', add)
+		console.log('add', add)
 	})
 
 	updates.forEach(update => {
 
 	})
 
-	removes.forEach(remove => {
-			remove.remove()
+	removes.forEach(r => {
+			r.remove()
 	})
 }
 
@@ -191,7 +188,7 @@ export function patchGame(game, client) {
 				cell.removeAttribute('player')
 
 			} else {
-				cell.setAttribute('player', value)
+				cell.setAttribute('player', value === client.user ? 'me' : 'opponent')
 			}
 
 		})
