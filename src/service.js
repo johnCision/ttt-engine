@@ -26,6 +26,7 @@ function serviceHandleListGames(replyPort, data) {
 	console.log('list games', games)
 
 	replyPort.postMessage({
+		for: user,
 		type: 'game-listing',
 		games
 	})
@@ -45,12 +46,15 @@ function serviceHandleGame(replyPort, data) {
 		}
 
 		replyPort.postMessage({
+			for: user,
 			type: MSG_TYPES.UPDATE,
 			gameId: game.gameId,
-			state: game.state
+			state: game.state,
+			actions: game.actions
 		})
 
 		replyPort.postMessage({
+			for: user,
 			type: MSG_TYPES.GAME,
 			...game
 		})
@@ -60,14 +64,15 @@ function serviceHandleGame(replyPort, data) {
 
 	const game = TTT.handleNewGame(user)
 
-	if(game.owner !== user && !game.offers.includes(owner)) { return }
-
 	replyPort.postMessage({
+		for: user,
 		type: MSG_TYPES.UPDATE,
 		gameId: game.gameId,
-		state: game.state
+		state: game.state,
+		actions: game.actions
 	})
 	replyPort.postMessage({
+		for: user,
 		type: MSG_TYPES.GAME,
 		...game
 	})
@@ -80,16 +85,16 @@ function serviceHandleOfferGame(replyPort, data) {
 	if(game === undefined) { return }
 
 	const offeredGame = TTTOwner.handleOfferGame(game, user, { autoAccept: true, target })
-	if(offeredGame === undefined) {
-		return
-	}
 
 	replyPort.postMessage({
+		for: user,
 		type: MSG_TYPES.UPDATE,
 		gameId: offeredGame.gameId,
-		state: offeredGame.state
+		state: offeredGame.state,
+		actions: offeredGame.actions
 	})
 	replyPort.postMessage({
+		for: user,
 		type: MSG_TYPES.GAME,
 		...offeredGame
 	})
@@ -104,11 +109,14 @@ function serviceHandleCloseGame(replyPort, data) {
 	const closedGame = TTTOwner.handleCloseGame(game, user)
 
 	replyPort.postMessage({
+		for: user,
 		type: MSG_TYPES.UPDATE,
 		gameId: closedGame.gameId,
-		state: closedGame.state
+		state: closedGame.state,
+		actions: closedGame.actions
 	})
 	replyPort.postMessage({
+		for: user,
 		type: MSG_TYPES.GAME,
 		...closedGame
 	})
@@ -123,11 +131,14 @@ function serviceHandleForfeitGame(replyPort, data) {
 	const forfeitGame = TTTPlayer.handleForfeit(game, user)
 
 	replyPort.postMessage({
+		for: user,
 		type: MSG_TYPES.UPDATE,
 		gameId: forfeitGame.gameId,
-		state: forfeitGame.state
+		state: forfeitGame.state,
+		actions: forfeitGame.actions
 	})
 	replyPort.postMessage({
+		for: user,
 		type: MSG_TYPES.GAME,
 		...forfeitGame
 	})
@@ -143,11 +154,14 @@ function serviceHandleAcceptOffer(replyPort, data) {
 	if(acceptedGame === undefined) { return }
 
 	replyPort.postMessage({
+		for: user,
 		type: MSG_TYPES.UPDATE,
 		gameId: acceptedGame.gameId,
-		state: acceptedGame.state
+		state: acceptedGame.state,
+		actions: acceptedGame.actions
 	})
 	replyPort.postMessage({
+		for: user,
 		type: MSG_TYPES.GAME,
 		...acceptedGame
 	})
@@ -162,11 +176,14 @@ function serviceHandleDeclineOffer(replyPort, data) {
 	const declinedGame = TTTChallenger.handleDeclineOffer(game, user)
 
 	replyPort.postMessage({
+		for: user,
 		type: MSG_TYPES.UPDATE,
 		gameId: declinedGame.gameId,
-		state: declinedGame.state
+		state: declinedGame.state,
+		actions: declinedGame.actions
 	})
 	replyPort.postMessage({
+		for: user,
 		type: MSG_TYPES.GAME,
 		...declinedGame
 	})
@@ -184,12 +201,15 @@ function serviceHandleMove(replyPort, data) {
 	const currentGame = TTTPlayer.handleMove(game, user, move)
 
 	replyPort.postMessage({
+		for: user,
 		type: MSG_TYPES.UPDATE,
 		gameId: currentGame.gameId,
-		state: currentGame.state
+		state: currentGame.state,
+		actions: currentGame.actions
 	})
 
 	replyPort.postMessage({
+		for: user,
 		type: MSG_TYPES.GAME,
 		...currentGame
 	})

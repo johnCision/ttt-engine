@@ -52,8 +52,7 @@ function initPort(port, options) {
 
 				return
 			}
-
-			if(state === 'active') {
+			else if(state === 'active') {
 				if(active.includes(aiUser)) {
 					console.log('AI:Game - my turn')
 
@@ -70,6 +69,9 @@ function initPort(port, options) {
 						})
 					}, 1000 * Math.random() * 4 + 1)
 
+				}
+				else if(state === 'resolved') {
+					// game resolved
 				}
 
 				return

@@ -64,7 +64,9 @@ function buildGameRow(gamesTable, game, client) {
 }
 
 function updateGameRow(tr, game) {
-	const { gameId, state } = game
+	const { gameId, state, actions } = game
+
+	console.log('updateGameRow', game)
 
 	const gameIdSlot = tr.querySelector('slot[name="gameId"]')
 	const vsSlot = tr.querySelector('slot[name="vs"]')
@@ -74,6 +76,17 @@ function updateGameRow(tr, game) {
 	vsSlot.innerText = playersToVs(game)
 	stateSlot.innerText = state
 
+	const buttonAccept = tr.querySelector('button[data-accept-game]')
+	const buttonDecline = tr.querySelector('button[data-decline-game]')
+	const buttonForfeit = tr.querySelector('button[data-forfeit-game]')
+	const buttonClose = tr.querySelector('button[data-close-game]')
+	const buttonOffer = tr.querySelector('button[data-offer-game]')
+
+	buttonAccept.toggleAttribute('disabled', !actions.includes('Accept'))
+	buttonDecline.toggleAttribute('disabled', !actions.includes('Decline'))
+	buttonForfeit.toggleAttribute('disabled', !actions.includes('Forfeit'))
+	buttonClose.toggleAttribute('disabled', !actions.includes('Close'))
+	buttonOffer.toggleAttribute('disabled', !actions.includes('Offer'))
 }
 
 
