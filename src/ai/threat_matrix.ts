@@ -2,13 +2,16 @@ import { EMPTY } from '../ttt.js'
 import {
 	NormalBoard,
 	NORMAL_SELF, NORMAL_OPPONENT
-} from './normal_board.js'
+} from '../ai/normal_board.js'
+import { GameBoard, NormalCell, NormalGameBoard, User, Combination } from '../ttt.types.js'
 
-export function evaluateMove(originalBoard, user) {
-	function calcThreatMatrix(board) {
+
+
+export function evaluateMove(originalBoard: GameBoard, user: User) {
+	function calcThreatMatrix(board: NormalGameBoard) {
 		const threatMatrix = [ ...board ].map(() => 0)
 
-		const winningCombinations = [
+		const winningCombinations: Array<Combination> = [
 			[0, 1, 2],
 			[3, 4, 5],
 			[6, 7, 8],
@@ -21,14 +24,14 @@ export function evaluateMove(originalBoard, user) {
 			[2, 4, 6]
 		]
 
-		function comboFirstEmptyIdx(board, combo) {
+		function comboFirstEmptyIdx(board: NormalGameBoard, combo: Combination) {
 			return combo
 				.map(idx =>({ idx, value: board[idx] }))
 				.filter(({ value }) => value === EMPTY)
 				[0]?.idx
 		}
 
-		function comboUserCount(board, normalUser, combo) {
+		function comboUserCount(board: NormalGameBoard, normalUser: NormalCell, combo: Combination) {
 			return combo.reduce((acc, idx) => {
 				if(board[idx] === EMPTY) { return acc }
 				if(board[idx] !== normalUser) { return acc }
@@ -37,11 +40,11 @@ export function evaluateMove(originalBoard, user) {
 			}, 0)
 		}
 
-		function comboSelfCount(board, combo) {
+		function comboSelfCount(board: NormalGameBoard, combo: Combination) {
 			return comboUserCount(board, NORMAL_SELF, combo)
 		}
 
-		function comboOpponentCount(board, combo) {
+		function comboOpponentCount(board: NormalGameBoard, combo: Combination) {
 			return comboUserCount(board, NORMAL_OPPONENT, combo)
 		}
 

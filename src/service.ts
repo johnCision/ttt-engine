@@ -1,5 +1,6 @@
 // file deepcode ignore UsageOfUndefinedReturnValue: early exists are ok
 import { TTT, TTTOwner, TTTChallenger, TTTPlayer } from './ttt.js'
+import { ClientMessage } from './service.msg-types.js'
 
 export const MSG_TYPES = {
 	LISTING: 'game-listing',
@@ -19,7 +20,7 @@ export const CLIENT_MSG_TYPES = {
 }
 
 //
-function serviceHandleListGames(replyPort, data) {
+function serviceHandleListGames(replyPort: MessagePort | BroadcastChannel, data: ClientMessage) {
 	const { user } = data
 
 	const games = TTT.handleListGames(user)
@@ -32,31 +33,32 @@ function serviceHandleListGames(replyPort, data) {
 	})
 }
 
-function serviceHandleGame(replyPort, data) {
+function serviceHandleGame(replyPort: MessagePort | BroadcastChannel, data: ClientMessage) {
 	const { gameId, user } = data
 
 	if(gameId !== undefined) {
 		// requesting game info not a new game
 		// console.log('request gameId info', gameId)
 
-		const game = TTT.games.get(gameId)
-		if(game === undefined) {
+		if(!TTT.games.has(gameId)) {
 			console.warn('invalid game id', gameId)
 			return
 		}
 
+		const existingGame = TTT.actionableGame(TTT.games.get(gameId), user)
+
 		replyPort.postMessage({
 			for: user,
 			type: MSG_TYPES.UPDATE,
-			gameId: game.gameId,
-			state: game.state,
-			actions: game.actions
+			gameId: existingGame.gameId,
+			state: existingGame.state,
+			actions: existingGame.actions
 		})
 
 		replyPort.postMessage({
 			for: user,
 			type: MSG_TYPES.GAME,
-			...game
+			...existingGame
 		})
 
 		return
@@ -78,7 +80,7 @@ function serviceHandleGame(replyPort, data) {
 	})
 }
 
-function serviceHandleOfferGame(replyPort, data) {
+function serviceHandleOfferGame(replyPort: MessagePort | BroadcastChannel, data: ClientMessage) {
 	const { gameId, user, target } = data
 
 	const game = TTT.games.get(gameId)
@@ -100,7 +102,7 @@ function serviceHandleOfferGame(replyPort, data) {
 	})
 }
 
-function serviceHandleCloseGame(replyPort, data) {
+function serviceHandleCloseGame(replyPort: MessagePort | BroadcastChannel, data: ClientMessage) {
 	const { gameId, user } = data
 
 	const game = TTT.games.get(gameId)
@@ -122,7 +124,7 @@ function serviceHandleCloseGame(replyPort, data) {
 	})
 }
 
-function serviceHandleForfeitGame(replyPort, data) {
+function serviceHandleForfeitGame(replyPort: MessagePort | BroadcastChannel, data: ClientMessage) {
 	const { gameId, user } = data
 
 	const game = TTT.games.get(gameId)
@@ -144,7 +146,7 @@ function serviceHandleForfeitGame(replyPort, data) {
 	})
 }
 
-function serviceHandleAcceptOffer(replyPort, data) {
+function serviceHandleAcceptOffer(replyPort: MessagePort | BroadcastChannel, data: ClientMessage) {
 	const { gameId, user } = data
 
 	const game = TTT.games.get(gameId)
@@ -167,7 +169,7 @@ function serviceHandleAcceptOffer(replyPort, data) {
 	})
 }
 
-function serviceHandleDeclineOffer(replyPort, data) {
+function serviceHandleDeclineOffer(replyPort: MessagePort | BroadcastChannel, data: ClientMessage) {
 	const { gameId, user } = data
 
 	const game = TTT.games.get(gameId)
@@ -189,7 +191,7 @@ function serviceHandleDeclineOffer(replyPort, data) {
 	})
 }
 
-function serviceHandleMove(replyPort, data) {
+function serviceHandleMove(replyPort: MessagePort | BroadcastChannel, data: ClientMessage) {
 	const { gameId, user, move } = data
 
 	const game = TTT.games.get(gameId)
@@ -215,9 +217,9 @@ function serviceHandleMove(replyPort, data) {
 	})
 }
 
-function initPort(port) {
+function initPort(port: MessagePort | BroadcastChannel) {
 
-	let pingTask
+	let pingTask: number = 0
 	setTimeout(() => {
 			pingTask = setInterval(() => {
 				port.postMessage({ type: '_service_ping' })
@@ -251,14 +253,18 @@ function initPort(port) {
 
 		console.warn('unhandled message', type)
 	}
+
+	return port
 }
 
 export class Service {
-	#port
+	#port: MessagePort | BroadcastChannel
 
-	static from(port) {
+	static from(port: MessagePort | BroadcastChannel) {
 		return new Service(port)
 	}
 
-	constructor(port) { this.#port = initPort(port) }
+	constructor(port: MessagePort | BroadcastChannel) { this.#port = initPort(port) }
+
+	close() { this.#port.close() }
 }

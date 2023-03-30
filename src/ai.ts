@@ -4,16 +4,33 @@ import { evaluateMove as evaluateMove_random } from './ai/random.js'
 import { evaluateMove as evaluateMove_minmax } from './ai/minmax.js'
 import { evaluateMove as evaluateMove_alphabeta } from './ai/alpha_beta.js'
 
-export const STRATEGIES = {
+import { User } from './ttt.types.js'
+
+export type Strategy = 'threat' | 'random' | 'minmax' | 'alphabeta'
+
+type Strategies = {
+	THREAT: Strategy,
+	RANDOM: Strategy,
+	MINMAX: Strategy,
+	ALPHABETA: Strategy,
+}
+
+export const STRATEGIES: Strategies = {
 	THREAT: 'threat',
 	RANDOM: 'random',
 	MINMAX: 'minmax',
 	ALPHABETA: 'alphabeta'
 }
 
+
+export type AIOptions = {
+	strategy: Strategy,
+	user: User
+}
+
 export const DEFAULT_STRATEGY = STRATEGIES.RANDOM
 
-function initPort(port, options) {
+function initPort(port: MessagePort | BroadcastChannel, options: AIOptions) {
 	const strategy = options?.strategy ?? DEFAULT_STRATEGY
 	const aiUser = options?.user
 
@@ -96,12 +113,15 @@ function initPort(port, options) {
 
 	return port
 }
+
 export class AI {
 	#port
 
-	static from(port, options) {
+	static from(port: MessagePort | BroadcastChannel, options: AIOptions) {
 		return new AI(port, options)
 	}
 
-	constructor(port, options) { this.#port = initPort(port, options) }
+	constructor(port: MessagePort | BroadcastChannel, options: AIOptions) { this.#port = initPort(port, options) }
+
+	close() { this.#port.close() }
 }

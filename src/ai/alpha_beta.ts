@@ -3,13 +3,14 @@ import {
 	NormalBoard,
 	NORMAL_SELF, NORMAL_OPPONENT
 } from './normal_board.js'
+import { GameBoard, NormalGameBoard, User, Proposal } from '../ttt.types'
 
-function pick(from) {
+function pick(from: Array<Proposal>) {
 	// console.log('pick from', from)
 	return from.sort((a, b) => b.value - a.value)[0]
 }
 
-function ab(board, depth, A, B, maximizing) {
+function ab(board: NormalGameBoard, depth: number, A: number, B: number, maximizing: boolean): number {
 	if(depth === 0) { return NormalBoard.heuristic(board) }
 	if(Board.isResolved(board)) { return NormalBoard.heuristic(board) }
 
@@ -30,7 +31,7 @@ function ab(board, depth, A, B, maximizing) {
 	}, Infinity)
 }
 
-export function evaluateMove(board, user) {
+export function evaluateMove(board: GameBoard, user: User) {
 	const depth = 8
 
 	return pick(NormalBoard.potentialBoards(NormalBoard.normalize(board, user), NORMAL_SELF).map(proposedMove => {

@@ -1,15 +1,16 @@
 import { Board } from '../ttt.js'
+import { Proposal, User, GameBoard, NormalGameBoard } from '../ttt.types.js'
 import {
 	NormalBoard,
 	NORMAL_SELF, NORMAL_OPPONENT
 } from './normal_board.js'
 
-function pick(from) {
+function pick(from: Array<Proposal>) {
 	// console.log('pick from', from)
 	return from.sort((a, b) => b.value - a.value)[0]
 }
 
-function mm(board, depth, maximizing) {
+function mm(board: NormalGameBoard, depth: number, maximizing: boolean): number {
 	if(depth === 0) { return NormalBoard.heuristic(board) }
 	if(Board.isResolved(board)) { return NormalBoard.heuristic(board) }
 
@@ -24,7 +25,7 @@ function mm(board, depth, maximizing) {
 	}, Infinity)
 }
 
-export function evaluateMove(board, user) {
+export function evaluateMove(board: GameBoard, user: User) {
 	const depth = 8
 
 	return pick(NormalBoard.potentialBoards(NormalBoard.normalize(board, user), NORMAL_SELF).map(proposedMove => {
