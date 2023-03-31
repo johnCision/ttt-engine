@@ -26,8 +26,11 @@ export type Game = {
 	createdAt?: number
 }
 
-export type ActionableGame = Game & {
+export type WithActions = {
 	actions: Array<string>,
+}
+
+export type ActionableGame = Game & WithActions & {
 	note?: string
 }
 

@@ -1,6 +1,6 @@
 // file deepcode ignore UsageOfUndefinedReturnValue: early exists are ok
 import { TTT, TTTOwner, TTTChallenger, TTTPlayer } from './ttt.js'
-import { ClientMessage } from './service.msg-types.js'
+import { AcceptMessage, ClientUserMessage, CloseMessage, DeclineMessage, ForfeitMessage, GameMessage, ListGamesMessage, MoveMessage, OfferMessage } from './service.msg-types.js'
 
 export const MSG_TYPES = {
 	LISTING: 'game-listing',
@@ -20,7 +20,7 @@ export const CLIENT_MSG_TYPES = {
 }
 
 //
-function serviceHandleListGames(replyPort: MessagePort | BroadcastChannel, data: ClientMessage) {
+function serviceHandleListGames(replyPort: MessagePort | BroadcastChannel, data: ListGamesMessage) {
 	const { user } = data
 
 	const games = TTT.handleListGames(user)
@@ -28,12 +28,12 @@ function serviceHandleListGames(replyPort: MessagePort | BroadcastChannel, data:
 
 	replyPort.postMessage({
 		for: user,
-		type: 'game-listing',
+		type: MSG_TYPES.LISTING,
 		games
 	})
 }
 
-function serviceHandleGame(replyPort: MessagePort | BroadcastChannel, data: ClientMessage) {
+function serviceHandleGame(replyPort: MessagePort | BroadcastChannel, data: GameMessage) {
 	const { gameId, user } = data
 
 	if(gameId !== undefined) {
@@ -80,7 +80,7 @@ function serviceHandleGame(replyPort: MessagePort | BroadcastChannel, data: Clie
 	})
 }
 
-function serviceHandleOfferGame(replyPort: MessagePort | BroadcastChannel, data: ClientMessage) {
+function serviceHandleOfferGame(replyPort: MessagePort | BroadcastChannel, data: OfferMessage) {
 	const { gameId, user, target } = data
 
 	const game = TTT.games.get(gameId)
@@ -102,7 +102,7 @@ function serviceHandleOfferGame(replyPort: MessagePort | BroadcastChannel, data:
 	})
 }
 
-function serviceHandleCloseGame(replyPort: MessagePort | BroadcastChannel, data: ClientMessage) {
+function serviceHandleCloseGame(replyPort: MessagePort | BroadcastChannel, data: CloseMessage) {
 	const { gameId, user } = data
 
 	const game = TTT.games.get(gameId)
@@ -124,7 +124,7 @@ function serviceHandleCloseGame(replyPort: MessagePort | BroadcastChannel, data:
 	})
 }
 
-function serviceHandleForfeitGame(replyPort: MessagePort | BroadcastChannel, data: ClientMessage) {
+function serviceHandleForfeitGame(replyPort: MessagePort | BroadcastChannel, data: ForfeitMessage) {
 	const { gameId, user } = data
 
 	const game = TTT.games.get(gameId)
@@ -146,7 +146,7 @@ function serviceHandleForfeitGame(replyPort: MessagePort | BroadcastChannel, dat
 	})
 }
 
-function serviceHandleAcceptOffer(replyPort: MessagePort | BroadcastChannel, data: ClientMessage) {
+function serviceHandleAcceptOffer(replyPort: MessagePort | BroadcastChannel, data: AcceptMessage) {
 	const { gameId, user } = data
 
 	const game = TTT.games.get(gameId)
@@ -169,7 +169,7 @@ function serviceHandleAcceptOffer(replyPort: MessagePort | BroadcastChannel, dat
 	})
 }
 
-function serviceHandleDeclineOffer(replyPort: MessagePort | BroadcastChannel, data: ClientMessage) {
+function serviceHandleDeclineOffer(replyPort: MessagePort | BroadcastChannel, data: DeclineMessage) {
 	const { gameId, user } = data
 
 	const game = TTT.games.get(gameId)
@@ -191,7 +191,7 @@ function serviceHandleDeclineOffer(replyPort: MessagePort | BroadcastChannel, da
 	})
 }
 
-function serviceHandleMove(replyPort: MessagePort | BroadcastChannel, data: ClientMessage) {
+function serviceHandleMove(replyPort: MessagePort | BroadcastChannel, data: MoveMessage) {
 	const { gameId, user, move } = data
 
 	const game = TTT.games.get(gameId)
@@ -229,7 +229,7 @@ function initPort(port: MessagePort | BroadcastChannel) {
 	port.onmessage = message => {
 		const replyPort = port
 		const { data } = message
-		const { type } = data
+		const { type } = data as ClientUserMessage
 
 		if(type === '_service_ping') {
 			console.warn('Service PING ... close')
