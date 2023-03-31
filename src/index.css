@@ -314,6 +314,9 @@ aside {
 	padding-inline: 1em;
 
 	min-width: 20ch;
+
+	/* hide until working */
+	display: none;
 }
 
 @container (max-width: 700px) {
